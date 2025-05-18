@@ -1,0 +1,72 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "getGreeting",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "",
+						"type": "string"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "_greeting",
+						"type": "string"
+					}
+				],
+				"name": "setGreeting",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"tp1/tp1.sol": "Tp1EtheKipu"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"tp1/tp1.sol": {
+			"keccak256": "0x9dcfbcc014052a1ae63a9b43f37b1d0d027e3dc0ed72326d32678e9b47fa7fe5",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://b17692d1c3d7d22db5a5139b16b01c6664a3849690527e306ec55f7b7361c8f8",
+				"dweb:/ipfs/QmeE3QehoDJVKJCPTN4yGMVsTE5QwaHNBoPKr77huF694E"
+			]
+		}
+	},
+	"version": 1
+}
