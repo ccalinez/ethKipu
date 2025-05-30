@@ -1,0 +1,74 @@
+{
+	"compiler": {
+		"version": "0.8.30+commit.73712a01"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "item",
+						"type": "string"
+					},
+					{
+						"internalType": "uint32",
+						"name": "duration",
+						"type": "uint32"
+					},
+					{
+						"internalType": "uint32",
+						"name": "basePrice",
+						"type": "uint32"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [],
+				"name": "bit",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"tp2/auction.sol": "Auction"
+		},
+		"evmVersion": "prague",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"tp2/auction.sol": {
+			"keccak256": "0x683cc3afef49bb0022158d2fb43e1c95610148d60d46c4793295b8ff21dbf27b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5cdda47d79376e3a2163097b70d62306cf51c8f83359d412b36fad4e1ac1bfbf",
+				"dweb:/ipfs/QmVq35odLEPF2uXBg6yeLW2PoB579jbjtFvbiWgEzpr5W6"
+			]
+		}
+	},
+	"version": 1
+}
