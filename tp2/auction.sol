@@ -8,6 +8,7 @@ contract Auction {
     uint256 completionTime;
     uint basePrice;
     Bit lastBit;
+    address [] bidders;
 
     mapping(address => Bit) balances;
 
@@ -29,6 +30,9 @@ contract Auction {
     }
 
     function bit() external payable active greatter {
+        if(!balances[msg.sender].exists){
+            bidders.push(msg.sender);
+        }
         lastBit.accumulated += msg.value;
         lastBit.amount = msg.value;
         lastBit.owner = msg.sender;
@@ -38,7 +42,14 @@ contract Auction {
     }
 
     function returnFunds() external onlyAdmin finished {
-
+        for (uint i = 0; i < bidders.length; i++) {
+            if(bidders[i] != lastBit.owner){
+                uint amount = balances[bidders[i]].accumulated;
+                amount = amount - (amount * 2) / 100;
+                balances[bidders[i]].accumulated = 0;
+                payable(bidders[i]).transfer(amount);
+            }
+        }
     }
 
     function withdrawal() external onlyBidder active {

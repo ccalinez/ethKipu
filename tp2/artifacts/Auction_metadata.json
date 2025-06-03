@@ -76,11 +76,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0xa0f5ac9883648efb7ce63cedaa696254985c994cd8ab3fe6a2845d7809279063",
+			"keccak256": "0x10832b9609b2ee5044215c8a6f7bb59a313ec60f0dc6fe7fa5b3d0d8303b06ba",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://833b5e3c735083399905b615e3dd6e9d58acb10fc6b0e93a7c749fab71a76b62",
-				"dweb:/ipfs/QmYZSWr3xZtmF4XfAtphgeJXGTLJay1k7bLjDygvJTZmA8"
+				"bzz-raw://b90ac7845517cf156cb4541e11f99914bbe31913db297bb8d226fba7de537940",
+				"dweb:/ipfs/QmVV2DGAKuqRpdFd5BLErUksRoi9gpqTsigu2GmukrWat4"
 			]
 		}
 	},
