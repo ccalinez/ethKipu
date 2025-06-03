@@ -35,6 +35,13 @@
 			},
 			{
 				"inputs": [],
+				"name": "returnFunds",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "withdrawal",
 				"outputs": [],
 				"stateMutability": "nonpayable",
@@ -69,11 +76,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0x3781a6e3a7a7016b12e7e30b52b0e2073553016f15e92e02e5475381f033345b",
+			"keccak256": "0xa0f5ac9883648efb7ce63cedaa696254985c994cd8ab3fe6a2845d7809279063",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://232c95a4188f92a771871cac3c1c08967a0a9f47c2b88279bcb3e9dd158c4205",
-				"dweb:/ipfs/QmcCnyREWR3nQxhLFD8vRVUnxQKEyzXxQNQwjA432qhFZ1"
+				"bzz-raw://833b5e3c735083399905b615e3dd6e9d58acb10fc6b0e93a7c749fab71a76b62",
+				"dweb:/ipfs/QmYZSWr3xZtmF4XfAtphgeJXGTLJay1k7bLjDygvJTZmA8"
 			]
 		}
 	},

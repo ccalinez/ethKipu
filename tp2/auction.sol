@@ -7,8 +7,6 @@ contract Auction {
     string auctioneItem;
     uint256 completionTime;
     uint basePrice;
-
-    uint32 extraTime;
     Bit lastBit;
 
     mapping(address => Bit) balances;
@@ -31,12 +29,33 @@ contract Auction {
     }
 
     function bit() external payable active greatter {
+        lastBit.accumulated += msg.value;
+        lastBit.amount = msg.value;
+        lastBit.owner = msg.sender;
+        lastBit.exists = true;
+        lastBit.timestamp = block.timestamp;
+        balances[msg.sender] = lastBit;
+    }
 
+    function returnFunds() external onlyAdmin finished {
 
     }
 
-    function withdrawal() external onlyBidder{
-        
+    function withdrawal() external onlyBidder active {
+        uint256 amount = balances[msg.sender].accumulated - balances[msg.sender].amount;
+        balances[msg.sender].accumulated = balances[msg.sender].amount;
+        payable(msg.sender).transfer(amount);
+    }
+
+    modifier onlyAdmin {
+        require(msg.sender == admin, "Only Admin User is allowed.");
+        _;
+    }
+
+    modifier finished {
+        require(block.timestamp > completionTime && block.timestamp > (lastBit.timestamp + 10 minutes),
+        "The auction has not ended yet.");
+        _;
     }
 
     // modificador que valida que solo ofertante con deposito pueda retirar el dinero
