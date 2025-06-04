@@ -7,13 +7,17 @@ contract Auction {
     string auctioneItem;
     uint256 completionTime;
     uint basePrice;
-    Bit lastBit;
+    Bid lastBid;
     address [] bidders;
 
-    mapping(address => Bit) balances;
+    mapping(address => Bid) balances;
+
+    event NewBid(address bidder, uint amount);
+    event AuctionFinished(string indexed auctioneItem, address indexed winner, uint amount);
+    event AuctionOpened(string indexed item, uint base);
 
 
-    struct Bit {
+    struct Bid {
         address owner;
         uint256 timestamp;
         uint256 accumulated;
@@ -27,23 +31,26 @@ contract Auction {
         auctioneItem = _item;
         completionTime = block.timestamp + _duration;
         basePrice = _basePrice;
+        emit AuctionOpened(auctioneItem, basePrice);
     }
 
-    function bit() external payable active greatter {
+    function bid() external payable active greatter {
         if(!balances[msg.sender].exists){
             bidders.push(msg.sender);
         }
-        lastBit.accumulated += msg.value;
-        lastBit.amount = msg.value;
-        lastBit.owner = msg.sender;
-        lastBit.exists = true;
-        lastBit.timestamp = block.timestamp;
-        balances[msg.sender] = lastBit;
+        lastBid.accumulated += msg.value;
+        lastBid.amount = msg.value;
+        lastBid.owner = msg.sender;
+        lastBid.exists = true;
+        lastBid.timestamp = block.timestamp;
+        balances[msg.sender] = lastBid;
+        emit NewBid(msg.sender, msg.value);
     }
 
-    function returnFunds() external onlyAdmin finished {
+    function close() external onlyAdmin finished {
+        emit AuctionFinished(auctioneItem, lastBid.owner, lastBid.amount);
         for (uint i = 0; i < bidders.length; i++) {
-            if(bidders[i] != lastBit.owner){
+            if(bidders[i] != lastBid.owner){
                 uint amount = balances[bidders[i]].accumulated;
                 amount = amount - (amount * 2) / 100;
                 balances[bidders[i]].accumulated = 0;
@@ -58,13 +65,18 @@ contract Auction {
         payable(msg.sender).transfer(amount);
     }
 
+    function inforWinner() external finished view returns (address winner, uint amount){
+        return (lastBid.owner, lastBid.amount);
+    }
+
+
     modifier onlyAdmin {
         require(msg.sender == admin, "Only Admin User is allowed.");
         _;
     }
 
     modifier finished {
-        require(block.timestamp > completionTime && block.timestamp > (lastBit.timestamp + 10 minutes),
+        require(block.timestamp > completionTime && block.timestamp > (lastBid.timestamp + 10 minutes),
         "The auction has not ended yet.");
         _;
     }
@@ -81,7 +93,7 @@ contract Auction {
         bool isActive = false;
         if(block.timestamp < (completionTime - 10 minutes)){
             isActive = true;
-        }else if(lastBit.exists && block.timestamp < (lastBit.timestamp + 10 minutes)){
+        }else if(lastBid.exists && block.timestamp < (lastBid.timestamp + 10 minutes)){
             isActive = true;
         }
         require(isActive, "The time for place a bid has finish");
@@ -91,7 +103,7 @@ contract Auction {
     // modificador que verifica una oferta mayor al 5% de la ultima oferta
     modifier greatter {
         bool valid = false;
-        if(lastBit.exists && msg.value > (lastBit.amount + (lastBit.amount * 5) / 100)){
+        if(lastBid.exists && msg.value > (lastBid.amount + (lastBid.amount * 5) / 100)){
             valid = true;
         }else if(msg.value > (basePrice + (basePrice * 5) / 100)){
             valid = true;

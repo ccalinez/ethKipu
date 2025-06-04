@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.30+commit.73712a01"
+		"version": "0.8.26+commit.8a97fa7a"
 	},
 	"language": "Solidity",
 	"output": {
@@ -27,17 +27,98 @@
 				"type": "constructor"
 			},
 			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "string",
+						"name": "auctioneItem",
+						"type": "string"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "winner",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "AuctionFinished",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "string",
+						"name": "item",
+						"type": "string"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "base",
+						"type": "uint256"
+					}
+				],
+				"name": "AuctionOpened",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "address",
+						"name": "bidder",
+						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "NewBid",
+				"type": "event"
+			},
+			{
 				"inputs": [],
-				"name": "bit",
+				"name": "bid",
 				"outputs": [],
 				"stateMutability": "payable",
 				"type": "function"
 			},
 			{
 				"inputs": [],
-				"name": "returnFunds",
+				"name": "close",
 				"outputs": [],
 				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "inforWinner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "winner",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
 				"type": "function"
 			},
 			{
@@ -63,7 +144,7 @@
 		"compilationTarget": {
 			"tp2/auction.sol": "Auction"
 		},
-		"evmVersion": "prague",
+		"evmVersion": "cancun",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -76,11 +157,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0x10832b9609b2ee5044215c8a6f7bb59a313ec60f0dc6fe7fa5b3d0d8303b06ba",
+			"keccak256": "0xfc9a97cee6b8506b71baea70f908d69d507ee96d85251fe2ee04b161eb5ec5a5",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b90ac7845517cf156cb4541e11f99914bbe31913db297bb8d226fba7de537940",
-				"dweb:/ipfs/QmVV2DGAKuqRpdFd5BLErUksRoi9gpqTsigu2GmukrWat4"
+				"bzz-raw://32f988f242b2885e79100769dab86385cc81b316e823f30050d883fa617ed4cc",
+				"dweb:/ipfs/QmbqFmFgUeWYeVTqYnhqCNPrr43RQNEjVfxBzawr4LsRqn"
 			]
 		}
 	},
