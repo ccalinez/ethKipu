@@ -3,89 +3,123 @@ pragma solidity >=0.8.7;
 
 contract Auction {
 
-    address admin;
-    string auctioneItem;
-    uint256 completionTime;
-    uint basePrice;
-    Bid lastBid;
-    address [] bidders;
+    uint private completionTime;
 
-    mapping(address => Bid) balances;
+    Stage stage;
+    Bid private lastBid;
+    address private admin;
+    string private auctioneItem;
+    
+    address [] private bidders;
+
+    mapping(address => Bid) private balances;
 
     event NewBid(address bidder, uint amount);
     event AuctionFinished(string indexed auctioneItem, address indexed winner, uint amount);
     event AuctionOpened(string indexed item, uint base);
 
+    error NotEnoughHigh(string detail);
+    error NothingToWithdraw();
+    error AccessNotAllowed(string detail);
 
     struct Bid {
-        address owner;
-        uint256 timestamp;
-        uint256 accumulated;
-        uint256 amount;
         bool exists;
+        uint timestamp;
+        uint accumulated;
+        uint amount;
+        address owner;
     }
 
+    enum Stage {TakingBid, Finished }
+    enum Rol {Admin, Bidder}
 
-    constructor(string memory _item, uint32 _duration, uint32 _basePrice){
+
+    constructor(uint _duration, uint base, string memory item){
         admin = msg.sender;
-        auctioneItem = _item;
+        auctioneItem = item;
         completionTime = block.timestamp + _duration;
-        basePrice = _basePrice;
-        emit AuctionOpened(auctioneItem, basePrice);
+        lastBid.amount = base;
+        stage = Stage.TakingBid;
+        emit AuctionOpened(auctioneItem, base);
     }
 
-    function bid() external payable active greatter {
-        if(!balances[msg.sender].exists){
+    function bid() external payable atStage(Stage.TakingBid)  {
+        if(msg.value <= (lastBid.amount + lastBid.amount * 0.05))
+            revert NotEnoughHigh("A valid bid must be 5 % greater than the last bid.");
+        if(!balances[msg.sender].exists)
             bidders.push(msg.sender);
-        }
+
         lastBid.accumulated += msg.value;
         lastBid.amount = msg.value;
         lastBid.owner = msg.sender;
         lastBid.exists = true;
         lastBid.timestamp = block.timestamp;
-        balances[msg.sender] = lastBid;
+
+        balances[msg.sender].accumulated += msg.value;
+        balances[msg.sender].amount = msg.value;
+        balances[msg.sender].owner = msg.sender;
+        balances[msg.sender].exists = true;
+        balances[msg.sender].timestamp = block.timestamp;
+
         emit NewBid(msg.sender, msg.value);
     }
 
-    function close() external onlyAdmin finished {
+    function withdrawal() external only(Rol.Bidder) atStage(Stage.TakingBid) {
+        uint remainder = balances[msg.sender].accumulated - balances[msg.sender].amount;
+        balances[msg.sender].accumulated = balances[msg.sender].amount;
+        if(remainder <= 0){
+            revert NothingToWithdraw();
+        }
+        payable(msg.sender).transfer(remainder);
+    }
+
+
+    modifier timedTransitions() {
+        uint limit = block.timestamp < completionTime ? completionTime : lastBid.timestamp + 10 minutes;
+        if (stage == Stage.TakingBid && 
+                    block.timestamp > limit)
+            nextStage();
+        _;
+    }
+
+
+    function close() external only(Rol.Admin) atStage(Stage.Finished) {
         emit AuctionFinished(auctioneItem, lastBid.owner, lastBid.amount);
         for (uint i = 0; i < bidders.length; i++) {
             if(bidders[i] != lastBid.owner){
                 uint amount = balances[bidders[i]].accumulated;
                 amount = amount - (amount * 2) / 100;
-                balances[bidders[i]].accumulated = 0;
+                delete balances[bidders[i]];
+                // transferir con funcion que no haga revert para usuario mas intencionado no me revierta y evite que el resto reciba su dinero
                 payable(bidders[i]).transfer(amount);
             }
         }
     }
 
-    function withdrawal() external onlyBidder active {
-        uint256 amount = balances[msg.sender].accumulated - balances[msg.sender].amount;
-        balances[msg.sender].accumulated = balances[msg.sender].amount;
-        payable(msg.sender).transfer(amount);
-    }
-
-    function inforWinner() external finished view returns (address winner, uint amount){
+    function inforWinner() external atStage(Stage.Finished) view returns (address winner, uint amount){
         return (lastBid.owner, lastBid.amount);
     }
 
+    function nextStage() internal {
+        stage = Stage(uint(stage) + 1);
+    }
 
-    modifier onlyAdmin {
-        require(msg.sender == admin, "Only Admin User is allowed.");
+
+    modifier only(Rol rol) {
+        if(rol == Rol.Admin && msg.sender != admin)
+            revert AccessNotAllowed("Only Admin User is allowed.");
+        if(rol == Rol.Bidder && !balances[msg.sender].exists)
+            revert AccessNotAllowed("Only Bidder are allowed.");
         _;
     }
 
-    modifier finished {
-        require(block.timestamp > completionTime && block.timestamp > (lastBid.timestamp + 10 minutes),
-        "The auction has not ended yet.");
+    modifier atStage(Stage _stage) {
+        if (stage != _stage)
+            revert FunctionInvalidAtThisStage();
         _;
     }
 
-    // modificador que valida que solo ofertante con deposito pueda retirar el dinero
-    modifier onlyBidder {
-        require(balances[msg.sender].exists, "Only Bidder are allowed.");
-        _;
-    }
+
 
     // modificador que verifica que se pueda aplicar una oferta  10 minutos antes que finalice la subasta 
     // o durante los 10 minutos posteriores de la ultima oferta pasado el tiempo de finalizacion de la subasta
@@ -100,16 +134,5 @@ contract Auction {
         _;
     }
 
-    // modificador que verifica una oferta mayor al 5% de la ultima oferta
-    modifier greatter {
-        bool valid = false;
-        if(lastBid.exists && msg.value > (lastBid.amount + (lastBid.amount * 5) / 100)){
-            valid = true;
-        }else if(msg.value > (basePrice + (basePrice * 5) / 100)){
-            valid = true;
-        }
-        require(valid, "A valid bid must be 5 % greater than the last bid.");
-        _;
-    }
 
 }

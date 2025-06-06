@@ -8,19 +8,19 @@
 			{
 				"inputs": [
 					{
-						"internalType": "string",
-						"name": "_item",
-						"type": "string"
-					},
-					{
-						"internalType": "uint32",
+						"internalType": "uint256",
 						"name": "_duration",
-						"type": "uint32"
+						"type": "uint256"
 					},
 					{
-						"internalType": "uint32",
-						"name": "_basePrice",
-						"type": "uint32"
+						"internalType": "uint256",
+						"name": "base",
+						"type": "uint256"
+					},
+					{
+						"internalType": "string",
+						"name": "item",
+						"type": "string"
 					}
 				],
 				"stateMutability": "nonpayable",
@@ -157,11 +157,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0xfc9a97cee6b8506b71baea70f908d69d507ee96d85251fe2ee04b161eb5ec5a5",
+			"keccak256": "0xc3416fcea1a0a6e165472842aa96d236d18c3aa77c13baf084ec92f896ac598b",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://32f988f242b2885e79100769dab86385cc81b316e823f30050d883fa617ed4cc",
-				"dweb:/ipfs/QmbqFmFgUeWYeVTqYnhqCNPrr43RQNEjVfxBzawr4LsRqn"
+				"bzz-raw://a9149331696359f483951f8177148a74ad8c12b906da51c01127c6e3d2b35095",
+				"dweb:/ipfs/QmdMMo6BhY7j2PRE8LgkPJBARdczLStbV1vuH774bn7hcK"
 			]
 		}
 	},
