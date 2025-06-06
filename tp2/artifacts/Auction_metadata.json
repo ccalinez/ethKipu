@@ -27,6 +27,44 @@
 				"type": "constructor"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "detail",
+						"type": "string"
+					}
+				],
+				"name": "AccessNotAllowed",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "enum Auction.Stage",
+						"name": "stage",
+						"type": "uint8"
+					}
+				],
+				"name": "NotAllowedAtStage",
+				"type": "error"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "detail",
+						"type": "string"
+					}
+				],
+				"name": "NotEnoughHigh",
+				"type": "error"
+			},
+			{
+				"inputs": [],
+				"name": "NothingToWithdraw",
+				"type": "error"
+			},
+			{
 				"anonymous": false,
 				"inputs": [
 					{
@@ -105,7 +143,47 @@
 			},
 			{
 				"inputs": [],
-				"name": "inforWinner",
+				"name": "showBids",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "exists",
+								"type": "bool"
+							},
+							{
+								"internalType": "uint256",
+								"name": "timestamp",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "accumulated",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount",
+								"type": "uint256"
+							},
+							{
+								"internalType": "address",
+								"name": "owner",
+								"type": "address"
+							}
+						],
+						"internalType": "struct Auction.Bid[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "showWinner",
 				"outputs": [
 					{
 						"internalType": "address",
@@ -157,11 +235,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0xc3416fcea1a0a6e165472842aa96d236d18c3aa77c13baf084ec92f896ac598b",
+			"keccak256": "0x244d49b7ee7f7bc4c06b9f5b3e9b996504f84075748e2bc8382584979da0bd5c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://a9149331696359f483951f8177148a74ad8c12b906da51c01127c6e3d2b35095",
-				"dweb:/ipfs/QmdMMo6BhY7j2PRE8LgkPJBARdczLStbV1vuH774bn7hcK"
+				"bzz-raw://b54ba87a1a91eb14d902384dbf4df5b81365ee372df5b21ea09f7441954bcf3a",
+				"dweb:/ipfs/QmUk2ByU53W8ANaRX2Jay6GJfLaFRjUfymndhwxuW6xYdA"
 			]
 		}
 	},

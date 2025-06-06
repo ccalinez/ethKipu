@@ -1,27 +1,37 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.7;
-
+/**
+* @title Auction Contract. Module 2 Final Project
+* @author Cristian Alinez
+* @notice This contract manages an Auction allowing bidders to place a higher bid to win the item up for auction.
+ */
 contract Auction {
 
+    // state variables declaration  
     uint private completionTime;
-
-    Stage stage;
+    Stage private stage;
     Bid private lastBid;
     address private admin;
     string private auctioneItem;
-    
     address [] private bidders;
-
     mapping(address => Bid) private balances;
 
+    // events definition
     event NewBid(address bidder, uint amount);
     event AuctionFinished(string indexed auctioneItem, address indexed winner, uint amount);
     event AuctionOpened(string indexed item, uint base);
 
+    // errors definition
     error NotEnoughHigh(string detail);
     error NothingToWithdraw();
     error AccessNotAllowed(string detail);
+    error NotAllowedAtStage(Stage stage);
 
+    /**
+    * @title Structure that represents a Pid place by a bidder
+    * @author Cristian Alinez
+    * @notice 
+    */
     struct Bid {
         bool exists;
         uint timestamp;
@@ -43,9 +53,10 @@ contract Auction {
         emit AuctionOpened(auctioneItem, base);
     }
 
-    function bid() external payable atStage(Stage.TakingBid)  {
-        if(msg.value <= (lastBid.amount + lastBid.amount * 0.05))
+    function bid() external payable timedTransitions atStage(Stage.TakingBid)  {
+        if(msg.value <= (lastBid.amount + ((lastBid.amount * 5) / 100)))
             revert NotEnoughHigh("A valid bid must be 5 % greater than the last bid.");
+
         if(!balances[msg.sender].exists)
             bidders.push(msg.sender);
 
@@ -64,7 +75,7 @@ contract Auction {
         emit NewBid(msg.sender, msg.value);
     }
 
-    function withdrawal() external only(Rol.Bidder) atStage(Stage.TakingBid) {
+    function withdrawal() external timedTransitions only(Rol.Bidder) atStage(Stage.TakingBid)  {
         uint remainder = balances[msg.sender].accumulated - balances[msg.sender].amount;
         balances[msg.sender].accumulated = balances[msg.sender].amount;
         if(remainder <= 0){
@@ -76,8 +87,7 @@ contract Auction {
 
     modifier timedTransitions() {
         uint limit = block.timestamp < completionTime ? completionTime : lastBid.timestamp + 10 minutes;
-        if (stage == Stage.TakingBid && 
-                    block.timestamp > limit)
+        if (stage == Stage.TakingBid && block.timestamp > limit)
             nextStage();
         _;
     }
@@ -87,17 +97,28 @@ contract Auction {
         emit AuctionFinished(auctioneItem, lastBid.owner, lastBid.amount);
         for (uint i = 0; i < bidders.length; i++) {
             if(bidders[i] != lastBid.owner){
+                Bid memory aux = balances[bidders[i]];
                 uint amount = balances[bidders[i]].accumulated;
                 amount = amount - (amount * 2) / 100;
                 delete balances[bidders[i]];
                 // transferir con funcion que no haga revert para usuario mas intencionado no me revierta y evite que el resto reciba su dinero
-                payable(bidders[i]).transfer(amount);
+                if(!payable(bidders[i]).send(amount)){
+                    balances[bidders[i]] = aux;
+                }
             }
         }
     }
 
-    function inforWinner() external atStage(Stage.Finished) view returns (address winner, uint amount){
+    function showWinner() external atStage(Stage.Finished) view returns (address winner, uint amount){
         return (lastBid.owner, lastBid.amount);
+    }
+
+    function showBids() external view atStage(Stage.TakingBid) returns (Bid [] memory){
+        Bid [] memory bids   = new Bid [](bidders.length);
+        for(uint i = 0; i < bidders.length; i++){
+            bids[i] = balances[bidders[i]];
+        }
+        return bids;
     }
 
     function nextStage() internal {
@@ -115,24 +136,7 @@ contract Auction {
 
     modifier atStage(Stage _stage) {
         if (stage != _stage)
-            revert FunctionInvalidAtThisStage();
+            revert NotAllowedAtStage(stage);
         _;
     }
-
-
-
-    // modificador que verifica que se pueda aplicar una oferta  10 minutos antes que finalice la subasta 
-    // o durante los 10 minutos posteriores de la ultima oferta pasado el tiempo de finalizacion de la subasta
-    modifier active {
-        bool isActive = false;
-        if(block.timestamp < (completionTime - 10 minutes)){
-            isActive = true;
-        }else if(lastBid.exists && block.timestamp < (lastBid.timestamp + 10 minutes)){
-            isActive = true;
-        }
-        require(isActive, "The time for place a bid has finish");
-        _;
-    }
-
-
 }
