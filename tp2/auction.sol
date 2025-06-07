@@ -181,7 +181,6 @@ contract Auction {
         }
         return (lastBid.owner, lastBid.amount);
     }
-
     
     function showBids() external view atStage(Stage.TakingBid) returns (Bid [] memory){
         Bid [] memory bids   = new Bid [](bidders.length);

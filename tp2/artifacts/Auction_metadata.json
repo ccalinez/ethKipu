@@ -267,6 +267,12 @@
 						"duration": "Time limit in seconds until valid bids are accepted",
 						"item": "Name of the auction Item"
 					}
+				},
+				"showWinner()": {
+					"returns": {
+						"amount": "Winner bid amount",
+						"winner": "Winner bid address"
+					}
 				}
 			},
 			"title": "Auction Contract. Module 2 Final Project",
@@ -350,11 +356,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0xb7b7612981f68e589a34b738b4b4821346a55e98cddf5a6bb0794186a6683bfc",
+			"keccak256": "0xfcefd6cf102c52e6c9c6ee60e6434943103a3f066bbe2481ababac0207d8c207",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://da38a6747ae65c96c0f97a0a7ca2b99037c564af44b1d74b045b467a066608b9",
-				"dweb:/ipfs/QmNTEEUK12ReVFsX15KLttvRL88BYATVASUNWPspsLFKa8"
+				"bzz-raw://1973dc6b7172e6d70cba55fedb12c4c64c5af907ceed659a8c34fd416c7cde35",
+				"dweb:/ipfs/QmbiUgsxxNU1Jn4PdnAWnNzunwnizJKdTuQqqTixRGEKxY"
 			]
 		}
 	},
