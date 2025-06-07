@@ -201,7 +201,7 @@
 						"type": "uint256"
 					}
 				],
-				"stateMutability": "view",
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -356,11 +356,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0xfcefd6cf102c52e6c9c6ee60e6434943103a3f066bbe2481ababac0207d8c207",
+			"keccak256": "0x737e34f0ac4f4b0e7354825a045d90d279340808522cf4e1618547b83a58f6b7",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1973dc6b7172e6d70cba55fedb12c4c64c5af907ceed659a8c34fd416c7cde35",
-				"dweb:/ipfs/QmbiUgsxxNU1Jn4PdnAWnNzunwnizJKdTuQqqTixRGEKxY"
+				"bzz-raw://1c202a702f7abcc468b6cd602dbe27838b703d501fc8b35a5513ce6d17006533",
+				"dweb:/ipfs/QmNdMh4yKcLSWgNEhT2ReZ1GX7ZQkgcPfc5tbKVkEwU5mf"
 			]
 		}
 	},

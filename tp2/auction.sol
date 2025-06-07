@@ -107,7 +107,7 @@ contract Auction {
         admin = msg.sender;
         auctioneItem = item;
         completionTime = block.timestamp + duration;
-        lastBid.amount = base;
+        lastBid.amount = base * 1 ether;
         stage = Stage.TakingBid;
         emit AuctionOpened(auctioneItem, base);
     }
@@ -153,7 +153,7 @@ contract Auction {
     /**
     * @notice Function that closes the auction and transfers all remaining funds to the bidders that didn't won the auction, taking 2% as commission.
     */
-    function close() external only(Rol.Admin) atStage(Stage.Finished) {
+    function close() external timedTransitions only(Rol.Admin) atStage(Stage.Finished) {
         if(!lastBid.exists){
             emit AuctionFinished(auctioneItem, address(0), 0);
             return;
@@ -175,7 +175,7 @@ contract Auction {
     * @return winner Winner bid address
     * @return amount Winner bid amount
     */
-    function showWinner() external atStage(Stage.Finished) view returns (address winner, uint amount){
+    function showWinner() external timedTransitions atStage(Stage.Finished)  returns (address winner, uint amount){
          if(!lastBid.exists){
             revert NotWinningBid();
         }
