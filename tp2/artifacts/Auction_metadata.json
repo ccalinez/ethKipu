@@ -61,6 +61,11 @@
 			},
 			{
 				"inputs": [],
+				"name": "NotWinningBid",
+				"type": "error"
+			},
+			{
+				"inputs": [],
 				"name": "NothingToWithdraw",
 				"type": "error"
 			},
@@ -284,6 +289,11 @@
 						"notice": "Error that is thrown when a bid is lower than 5% greater of the previous bid"
 					}
 				],
+				"NotWinningBid()": [
+					{
+						"notice": "Error that is thrown when no bid has been placed and the Auction has ended without a bid."
+					}
+				],
 				"NothingToWithdraw()": [
 					{
 						"notice": "Error that is thrown when a bidder tries to withdraw remaining funds that you do not have"
@@ -304,13 +314,19 @@
 			"kind": "user",
 			"methods": {
 				"bid()": {
-					"notice": "Function that places a bid on the auction, it will revert with an error code in case of insufficient funds."
+					"notice": "Function that places a bid on the auction, it will revert with an error code in case of bid isn't a 5% higher than the last one."
+				},
+				"close()": {
+					"notice": "Function that closes the auction and transfers all remaining funds to the bidders that didn't won the auction, taking 2% as commission."
 				},
 				"constructor": {
 					"notice": "Constructor that setup the auction configuration and announces the opening of the auction"
 				},
+				"showWinner()": {
+					"notice": "Function tha allow to get the address of the highest bidder, the amount of his bids, if he has been placed any bid or not."
+				},
 				"withdrawal()": {
-					"notice": "Function that withdraws the remaining funds from the Auction."
+					"notice": "Function that allows bidders to withdraw the remaining funds from the last bid. It will reverse with an error code if the bidder has no remaining funds to withdraw."
 				}
 			},
 			"notice": "This contract manages an Auction allowing bidders to place a higher bid to win the item up for auction.",
@@ -334,11 +350,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0x1096e673be1e58f9096f8ece5eed9765ac26a3d188bc8855f20c00f18f9b0d0f",
+			"keccak256": "0xb7b7612981f68e589a34b738b4b4821346a55e98cddf5a6bb0794186a6683bfc",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://bcb9c70c916167ae5145809734590c50bc37f2a25cb2cebef560eb21702f2e2d",
-				"dweb:/ipfs/QmR4BzhZgADJmGeBTVKvgkAw3sYeoNpfqdxcJwpa3yqCiX"
+				"bzz-raw://da38a6747ae65c96c0f97a0a7ca2b99037c564af44b1d74b045b467a066608b9",
+				"dweb:/ipfs/QmNTEEUK12ReVFsX15KLttvRL88BYATVASUNWPspsLFKa8"
 			]
 		}
 	},

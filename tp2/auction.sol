@@ -62,6 +62,10 @@ contract Auction {
     */
     error NotAllowedAtStage(Stage stage);
 
+    /**
+    * @notice Error that is thrown when no bid has been placed and the Auction has ended without a bid.
+    */
+    error NotWinningBid();
 
     // Struts definition
     /**
@@ -109,7 +113,7 @@ contract Auction {
     }
 
     /**
-    * @notice Function that places a bid on the auction, it will revert with an error code in case of insufficient funds.
+    * @notice Function that places a bid on the auction, it will revert with an error code in case of bid isn't a 5% higher than the last one.
     */
     function bid() external payable timedTransitions atStage(Stage.TakingBid)  {
         if(msg.value <= (lastBid.amount + ((lastBid.amount * 5) / 100)))
@@ -134,7 +138,7 @@ contract Auction {
     }
 
     /**
-    * @notice Function that withdraws the remaining funds from the Auction.
+    * @notice Function that allows bidders to withdraw the remaining funds from the last bid. It will reverse with an error code if the bidder has no remaining funds to withdraw.
     */
     function withdrawal() external timedTransitions only(Rol.Bidder) atStage(Stage.TakingBid)  {
         uint remainder = balances[msg.sender].accumulated - balances[msg.sender].amount;
@@ -145,26 +149,40 @@ contract Auction {
         payable(msg.sender).transfer(remainder);
     }
 
+
+    /**
+    * @notice Function that closes the auction and transfers all remaining funds to the bidders that didn't won the auction, taking 2% as commission.
+    */
     function close() external only(Rol.Admin) atStage(Stage.Finished) {
+        if(!lastBid.exists){
+            emit AuctionFinished(auctioneItem, address(0), 0);
+            return;
+        }  
         emit AuctionFinished(auctioneItem, lastBid.owner, lastBid.amount);
         for (uint i = 0; i < bidders.length; i++) {
             if(bidders[i] != lastBid.owner){
-                Bid memory aux = balances[bidders[i]];
                 uint amount = balances[bidders[i]].accumulated;
-                amount = amount - (amount * 2) / 100;
-                delete balances[bidders[i]];
-                // transferir con funcion que no haga revert para usuario mas intencionado no me revierta y evite que el resto reciba su dinero
-                if(!payable(bidders[i]).send(amount)){
-                    balances[bidders[i]] = aux;
+                balances[bidders[i]].accumulated = 0;
+                if(!payable(bidders[i]).send(amount - (amount * 2) / 100)){
+                    balances[bidders[i]].accumulated = amount;
                 }
             }
         }
     }
 
+    /**
+    * @notice Function tha allow to get the address of the highest bidder, the amount of his bids, if he has been placed any bid or not.
+    * @return winner Winner bid address
+    * @return amount Winner bid amount
+    */
     function showWinner() external atStage(Stage.Finished) view returns (address winner, uint amount){
+         if(!lastBid.exists){
+            revert NotWinningBid();
+        }
         return (lastBid.owner, lastBid.amount);
     }
 
+    
     function showBids() external view atStage(Stage.TakingBid) returns (Bid [] memory){
         Bid [] memory bids   = new Bid [](bidders.length);
         for(uint i = 0; i < bidders.length; i++){
