@@ -9,7 +9,7 @@
 				"inputs": [
 					{
 						"internalType": "uint256",
-						"name": "_duration",
+						"name": "duration",
 						"type": "uint256"
 					},
 					{
@@ -112,7 +112,7 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
+						"indexed": true,
 						"internalType": "address",
 						"name": "bidder",
 						"type": "address"
@@ -208,13 +208,112 @@
 			}
 		],
 		"devdoc": {
+			"author": "Cristian Alinez",
+			"errors": {
+				"AccessNotAllowed(string)": [
+					{
+						"params": {
+							"detail": "Error detail"
+						}
+					}
+				],
+				"NotAllowedAtStage(uint8)": [
+					{
+						"params": {
+							"stage": "Current stage"
+						}
+					}
+				],
+				"NotEnoughHigh(string)": [
+					{
+						"params": {
+							"detail": "Error detail"
+						}
+					}
+				]
+			},
+			"events": {
+				"AuctionFinished(string,address,uint256)": {
+					"params": {
+						"amount": "Amount of the highest bid.",
+						"auctioneItem": "Name of the Item on which was the Auction.",
+						"winner": "Bidder Address of the highest bid."
+					}
+				},
+				"AuctionOpened(string,uint256)": {
+					"params": {
+						"base": "Initial value of the Auction",
+						"item": "Name of the Item on which was the Auction."
+					}
+				},
+				"NewBid(address,uint256)": {
+					"params": {
+						"amount": "Amount of the Bid placed.",
+						"bidder": "bidder Address of the user placing a new Bid."
+					}
+				}
+			},
 			"kind": "dev",
-			"methods": {},
+			"methods": {
+				"constructor": {
+					"author": "Cristian Alinez",
+					"params": {
+						"base": "Initial value of the bid",
+						"duration": "Time limit in seconds until valid bids are accepted",
+						"item": "Name of the auction Item"
+					}
+				}
+			},
+			"title": "Auction Contract. Module 2 Final Project",
 			"version": 1
 		},
 		"userdoc": {
+			"errors": {
+				"AccessNotAllowed(string)": [
+					{
+						"notice": "Error that is thrown when the user does not have a valid role to perform this action."
+					}
+				],
+				"NotAllowedAtStage(uint8)": [
+					{
+						"notice": "Error that is thrown when the user tries to perform an action not allowed in the current stage."
+					}
+				],
+				"NotEnoughHigh(string)": [
+					{
+						"notice": "Error that is thrown when a bid is lower than 5% greater of the previous bid"
+					}
+				],
+				"NothingToWithdraw()": [
+					{
+						"notice": "Error that is thrown when a bidder tries to withdraw remaining funds that you do not have"
+					}
+				]
+			},
+			"events": {
+				"AuctionFinished(string,address,uint256)": {
+					"notice": "Event emitted when the auction is over and a winner was found."
+				},
+				"AuctionOpened(string,uint256)": {
+					"notice": "Event emitted when the auction is open and bids are placed."
+				},
+				"NewBid(address,uint256)": {
+					"notice": "Event emitted when a new bid is placed in the Auction."
+				}
+			},
 			"kind": "user",
-			"methods": {},
+			"methods": {
+				"bid()": {
+					"notice": "Function that places a bid on the auction, it will revert with an error code in case of insufficient funds."
+				},
+				"constructor": {
+					"notice": "Constructor that setup the auction configuration and announces the opening of the auction"
+				},
+				"withdrawal()": {
+					"notice": "Function that withdraws the remaining funds from the Auction."
+				}
+			},
+			"notice": "This contract manages an Auction allowing bidders to place a higher bid to win the item up for auction.",
 			"version": 1
 		}
 	},
@@ -235,11 +334,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0x244d49b7ee7f7bc4c06b9f5b3e9b996504f84075748e2bc8382584979da0bd5c",
+			"keccak256": "0x1096e673be1e58f9096f8ece5eed9765ac26a3d188bc8855f20c00f18f9b0d0f",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b54ba87a1a91eb14d902384dbf4df5b81365ee372df5b21ea09f7441954bcf3a",
-				"dweb:/ipfs/QmUk2ByU53W8ANaRX2Jay6GJfLaFRjUfymndhwxuW6xYdA"
+				"bzz-raw://bcb9c70c916167ae5145809734590c50bc37f2a25cb2cebef560eb21702f2e2d",
+				"dweb:/ipfs/QmR4BzhZgADJmGeBTVKvgkAw3sYeoNpfqdxcJwpa3yqCiX"
 			]
 		}
 	},

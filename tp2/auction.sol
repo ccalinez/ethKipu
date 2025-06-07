@@ -17,20 +17,57 @@ contract Auction {
     mapping(address => Bid) private balances;
 
     // events definition
-    event NewBid(address bidder, uint amount);
+    /**
+    * @notice Event emitted when a new bid is placed in the Auction.
+    * @param bidder bidder Address of the user placing a new Bid.
+    * @param amount Amount of the Bid placed.
+    */
+    event NewBid(address indexed bidder, uint amount);
+
+    /**
+    * @notice Event emitted when the auction is over and a winner was found.
+    * @param auctioneItem Name of the Item on which was the Auction.
+    * @param winner Bidder Address of the highest bid.
+    * @param amount Amount of the highest bid.
+    */
     event AuctionFinished(string indexed auctioneItem, address indexed winner, uint amount);
+    /**
+    * @notice Event emitted when the auction is open and bids are placed.
+    * @param item Name of the Item on which was the Auction.
+    * @param base Initial value of the Auction
+    */
     event AuctionOpened(string indexed item, uint base);
 
     // errors definition
+    /**
+    * @notice Error that is thrown when a bid is lower than 5% greater of the previous bid
+    * @param detail Error detail
+    */
     error NotEnoughHigh(string detail);
-    error NothingToWithdraw();
-    error AccessNotAllowed(string detail);
-    error NotAllowedAtStage(Stage stage);
 
     /**
-    * @title Structure that represents a Pid place by a bidder
+    * @notice Error that is thrown when a bidder tries to withdraw remaining funds that you do not have
+    */
+    error NothingToWithdraw();
+
+    /**
+    * @notice Error that is thrown when the user does not have a valid role to perform this action.
+    * @param detail Error detail
+    */
+    error AccessNotAllowed(string detail);
+
+    /**
+    * @notice Error that is thrown when the user tries to perform an action not allowed in the current stage.
+    * @param stage Current stage
+    */
+    error NotAllowedAtStage(Stage stage);
+
+
+    // Struts definition
+    /**
+    * @title Bid struct
     * @author Cristian Alinez
-    * @notice 
+    * @notice Structure that represents a Bid placed by a bidder
     */
     struct Bid {
         bool exists;
@@ -40,19 +77,40 @@ contract Auction {
         address owner;
     }
 
+    // Enums definitions
+    /**
+    * @title Stage enum
+    * @author Cristian Alinez
+    * @notice Enum that represents the stages through which an auction takes place
+    */
     enum Stage {TakingBid, Finished }
+
+    /**
+    * @title Rol enum
+    * @author Cristian Alinez
+    * @notice Enum that represents the roles for the auction users
+    */
     enum Rol {Admin, Bidder}
 
-
-    constructor(uint _duration, uint base, string memory item){
+    /**
+    * @author Cristian Alinez
+    * @notice Constructor that setup the auction configuration and announces the opening of the auction
+    * @param  duration Time limit in seconds until valid bids are accepted
+    * @param  base Initial value of the bid
+    * @param  item Name of the auction Item
+    */
+    constructor(uint duration, uint base, string memory item){
         admin = msg.sender;
         auctioneItem = item;
-        completionTime = block.timestamp + _duration;
+        completionTime = block.timestamp + duration;
         lastBid.amount = base;
         stage = Stage.TakingBid;
         emit AuctionOpened(auctioneItem, base);
     }
 
+    /**
+    * @notice Function that places a bid on the auction, it will revert with an error code in case of insufficient funds.
+    */
     function bid() external payable timedTransitions atStage(Stage.TakingBid)  {
         if(msg.value <= (lastBid.amount + ((lastBid.amount * 5) / 100)))
             revert NotEnoughHigh("A valid bid must be 5 % greater than the last bid.");
@@ -75,6 +133,9 @@ contract Auction {
         emit NewBid(msg.sender, msg.value);
     }
 
+    /**
+    * @notice Function that withdraws the remaining funds from the Auction.
+    */
     function withdrawal() external timedTransitions only(Rol.Bidder) atStage(Stage.TakingBid)  {
         uint remainder = balances[msg.sender].accumulated - balances[msg.sender].amount;
         balances[msg.sender].accumulated = balances[msg.sender].amount;
@@ -83,15 +144,6 @@ contract Auction {
         }
         payable(msg.sender).transfer(remainder);
     }
-
-
-    modifier timedTransitions() {
-        uint limit = block.timestamp < completionTime ? completionTime : lastBid.timestamp + 10 minutes;
-        if (stage == Stage.TakingBid && block.timestamp > limit)
-            nextStage();
-        _;
-    }
-
 
     function close() external only(Rol.Admin) atStage(Stage.Finished) {
         emit AuctionFinished(auctioneItem, lastBid.owner, lastBid.amount);
@@ -139,4 +191,12 @@ contract Auction {
             revert NotAllowedAtStage(stage);
         _;
     }
+
+    modifier timedTransitions() {
+        uint limit = block.timestamp < completionTime ? completionTime : lastBid.timestamp + 10 minutes;
+        if (stage == Stage.TakingBid && block.timestamp > limit)
+            nextStage();
+        _;
+    }
+
 }
