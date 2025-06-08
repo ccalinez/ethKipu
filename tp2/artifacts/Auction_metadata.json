@@ -268,6 +268,11 @@
 						"item": "Name of the auction Item"
 					}
 				},
+				"showBids()": {
+					"returns": {
+						"_0": "Array of bids placed."
+					}
+				},
 				"showWinner()": {
 					"returns": {
 						"amount": "Winner bid amount",
@@ -323,13 +328,16 @@
 					"notice": "Function that places a bid on the auction, it will revert with an error code in case of bid isn't a 5% higher than the last one."
 				},
 				"close()": {
-					"notice": "Function that closes the auction and transfers all remaining funds to the bidders that didn't won the auction, taking 2% as commission."
+					"notice": "Function that closes the auction communicating who won the auction and transfers all remaining funds to the bidders that didn't won the auction, taking 2% as commission."
 				},
 				"constructor": {
 					"notice": "Constructor that setup the auction configuration and announces the opening of the auction"
 				},
+				"showBids()": {
+					"notice": "Function that allows to get all bids placed by the auction."
+				},
 				"showWinner()": {
-					"notice": "Function tha allow to get the address of the highest bidder, the amount of his bids, if he has been placed any bid or not."
+					"notice": "Function tha allow to get the address and the amount of the highest bidder. It will reverse with an error code if not the bidder has place a bid."
 				},
 				"withdrawal()": {
 					"notice": "Function that allows bidders to withdraw the remaining funds from the last bid. It will reverse with an error code if the bidder has no remaining funds to withdraw."
@@ -356,11 +364,11 @@
 	},
 	"sources": {
 		"tp2/auction.sol": {
-			"keccak256": "0x737e34f0ac4f4b0e7354825a045d90d279340808522cf4e1618547b83a58f6b7",
+			"keccak256": "0x8382a9b53bfd2197ad1a6df25a92fe27121961c864498329b0e6d38c7f5edfcf",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1c202a702f7abcc468b6cd602dbe27838b703d501fc8b35a5513ce6d17006533",
-				"dweb:/ipfs/QmNdMh4yKcLSWgNEhT2ReZ1GX7ZQkgcPfc5tbKVkEwU5mf"
+				"bzz-raw://cb0a8a39d3fdb3b0e20e34827b3a9a2005db08d75501d0420b204af8d8369af4",
+				"dweb:/ipfs/QmXPqzVr9FySEVG5zj4WHwjojQpqs6WFoGHemqeneDsHnN"
 			]
 		}
 	},

@@ -151,7 +151,7 @@ contract Auction {
 
 
     /**
-    * @notice Function that closes the auction and transfers all remaining funds to the bidders that didn't won the auction, taking 2% as commission.
+    * @notice Function that closes the auction communicating who won the auction and transfers all remaining funds to the bidders that didn't won the auction, taking 2% as commission.
     */
     function close() external timedTransitions only(Rol.Admin) atStage(Stage.Finished) {
         if(!lastBid.exists){
@@ -171,7 +171,7 @@ contract Auction {
     }
 
     /**
-    * @notice Function tha allow to get the address of the highest bidder, the amount of his bids, if he has been placed any bid or not.
+    * @notice Function tha allow to get the address and the amount of the highest bidder. It will reverse with an error code if not the bidder has place a bid.
     * @return winner Winner bid address
     * @return amount Winner bid amount
     */
@@ -182,7 +182,11 @@ contract Auction {
         return (lastBid.owner, lastBid.amount);
     }
     
-    function showBids() external view atStage(Stage.TakingBid) returns (Bid [] memory){
+    /**
+    * @notice Function that allows to get all bids placed by the auction.
+    * @return Array of bids placed.
+    */
+    function showBids() external view  returns (Bid [] memory){
         Bid [] memory bids   = new Bid [](bidders.length);
         for(uint i = 0; i < bidders.length; i++){
             bids[i] = balances[bidders[i]];
@@ -190,25 +194,37 @@ contract Auction {
         return bids;
     }
 
+    /**
+    * @notice Function that set auction stage to the next one.
+    */
     function nextStage() internal {
         stage = Stage(uint(stage) + 1);
     }
 
-
-    modifier only(Rol rol) {
-        if(rol == Rol.Admin && msg.sender != admin)
+    /**
+    * @notice Modifier that revert with code error if the the sender hasn't the allowed role.
+    * @param role Role allowed to perform an action.
+    */
+    modifier only(Rol role) {
+        if(role == Rol.Admin && msg.sender != admin)
             revert AccessNotAllowed("Only Admin User is allowed.");
-        if(rol == Rol.Bidder && !balances[msg.sender].exists)
+        if(role == Rol.Bidder && !balances[msg.sender].exists)
             revert AccessNotAllowed("Only Bidder are allowed.");
         _;
     }
 
+    /**
+    * @notice Modifier that revert with code error if an action isn't perform during an allowed stage.
+    * @param _stage Stage allowed to perform an action.
+    */
     modifier atStage(Stage _stage) {
         if (stage != _stage)
             revert NotAllowedAtStage(stage);
         _;
     }
-
+    /**
+    * @notice Modifier that change the current stage if auction time limit has been reached.
+    */
     modifier timedTransitions() {
         uint limit = block.timestamp < completionTime ? completionTime : lastBid.timestamp + 10 minutes;
         if (stage == Stage.TakingBid && block.timestamp > limit)
