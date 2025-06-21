@@ -128,5 +128,23 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         require(deadline > block.timestamp - start, "Deadline reached!");
         return (amountA, amountB);
     }
+
+     function getPrice(address tokenA, address tokenB) external view returns (uint price){
+        require(tokenA != address(0) && tokenB != address(0), "Invalid token addresses!");
+        require(reserveA > 0 && reserveB > 0, "No available liquidity tokens!");
+        price = (reserveB * 1e18) / reserveA;
+        return price;
+     }
+
+     function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut){
+        require(amountIn > 0 , "Invalid input parameters!");
+        amountOut = (amountIn * reserveOut) / (reserveIn + amountIn);
+        return amountOut;
+     }
+
+     function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path,
+         address to, uint deadline) external returns (uint[] memory amounts){
+
+     }
 }
 
