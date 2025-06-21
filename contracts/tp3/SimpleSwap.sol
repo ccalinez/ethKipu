@@ -5,6 +5,8 @@ pragma solidity ^0.8.27;
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import {ERC20Pausable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/math/Math.sol";
+
 
 contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     constructor(address initialOwner)
@@ -58,12 +60,13 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         
         reserveA += amountA;
         reserveB += amountB;
-        
+
         ERC20(tokenA).transferFrom(msg.sender, address(this), amountA);
         ERC20(tokenB).transferFrom(msg.sender, address(this), amountB);
-        
 
-       
+        liquidity = calculateLiquidityToken(amountA, amountB);
+        this.transfer(msg.sender, liquidity);
+       require(deadline > block.timestamp, "Deadline reached!");
     }
 
     function calculateLiquidityAmounts(uint amountADesired, uint amountBDesired) internal view
@@ -81,8 +84,10 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     }
 
     function calculateLiquidityToken(uint256 amountA, uint256 amountB) internal view returns (uint256){
-        uint proportionA = amountA / reserveA;
-        uint proportionB = amountB / reserveB;
-        return proportionA < proportionB ? proportionA * this.totalSupply() : proportionB * this.totalSupply();
+         if(this.totalSupply() == 0){
+             return Math.sqrt(amountA * amountB);
+        }else {
+            return (Math.min((amountA / reserveA), (amountB / reserveB)) * this.totalSupply());
+        }
     }
 }
