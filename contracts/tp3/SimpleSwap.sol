@@ -144,7 +144,35 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
 
      function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path,
          address to, uint deadline) external returns (uint[] memory amounts){
+        
+        uint start = block.timestamp;
 
+        require(amountIn > 0 && amountOutMin > 0 && path.length == 2,"Invalid input parameters!");
+        require(path[0] != address(0) && path[1] != address(0), "Invalid token addresses!");
+        require(to != address(0), "Invalid recipient address");
+
+        bool isTokenA = keccak256(abi.encodePacked(ERC20(path[0]).symbol())) == keccak256(abi.encodePacked("MTKA"));
+
+        uint amountOut = this.getAmountOut(amountIn, (isTokenA ? reserveA : reserveB), isTokenA ? reserveB : reserveA);
+        require((amountOut >= amountOutMin),"Not meet the minimum!");
+        require(ERC20(path[0]).balanceOf(msg.sender) >= amountIn, "Insufficient Token funds!");
+        require(ERC20(path[1]).balanceOf(address(this)) >= amountOut, "Insufficient Token funds!");
+        
+        if(isTokenA){
+            reserveA += amountIn;
+            reserveB -= amountOut;
+        }else{
+            reserveA -= amountIn;
+            reserveB += amountOut; 
+        }
+
+        ERC20(path[0]).transferFrom(msg.sender, address(this), amountIn);
+        ERC20(path[1]).transfer(msg.sender, amountOut);
+
+        amounts[0] = amountIn;
+        amounts[1] = amountOut;
+        require(deadline > block.timestamp - start, "Deadline reached!");
+        return amounts;
      }
 }
 
