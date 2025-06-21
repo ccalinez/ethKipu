@@ -2,17 +2,18 @@
 // Compatible with OpenZeppelin Contracts ^5.0.0
 pragma solidity ^0.8.27;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {Pausable} from "@openzeppelin/contracts/utils/Pausable.sol";
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import {ERC20Pausable} from "@openzeppelin/contracts/token/ERC20/extensions/ERC20Pausable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract SimpleSwap is Pausable, Ownable {
+contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
+    constructor(address initialOwner)
+        ERC20("LiquidityToken", "LTK")
+        Ownable(initialOwner)
+    {}
 
-    uint private reserveA;
-    uint private reserveB;
-
-
-    constructor(address initialOwner) Ownable(initialOwner) {}
+    uint256 private reserveA;
+    uint256 private reserveB;
 
     function pause() public onlyOwner {
         _pause();
@@ -22,19 +23,66 @@ contract SimpleSwap is Pausable, Ownable {
         _unpause();
     }
 
-    function addLiquidity(address tokenA, address tokenB, uint amountADesired, uint amountBDesired,
-         uint amountAMin, uint amountBMin, address to, uint deadline) 
-         external returns (uint amountA, uint amountB, uint liquidity){
+    // The following functions are overrides required by Solidity.
 
-    require(tokenA != address(0) && tokenB != address(0), "Cannot be 0 address");
-        //require(amountADesired >= amountAMin || amountADesired <= reserveA, "Invalid amount to deposit in token A");
+    function _update(address from, address to, uint256 value)
+        internal
+        override(ERC20, ERC20Pausable)
+    {
+        super._update(from, to, value);
+    }
+
+    /**
+    *  Given some asset amount and reserves, returns an amount of the other asset representing equivalent value.
+    */
+    function quote(uint amountA, uint reserveA, uint reserveB) internal pure returns (uint amountB){
+        return ((amountA * reserveB) / (reserveA + amountA));
+    }
+
+
+    function addLiquidity(address tokenA, address tokenB, uint amountADesired, uint amountBDesired, 
+        uint amountAMin, uint amountBMin, address to, uint deadline) 
+        external returns (uint amountA, uint amountB, uint liquidity){
+        // validacion de parametros
+        require(tokenA != address(0) && tokenB != address(0), "Invalid token addresses!");
+        require(to != address(0), "Invalid recipient address");
+        require((amountADesired <= 0 || amountBDesired <= 0),"Invalid input parameters!"); 
+
+        (amountA, amountB) = calculateLiquidityAmounts(amountADesired, amountBDesired);
+        require((amountA > amountAMin),"Not meet the minimum for TokenA!");
+        require((amountB > amountBMin),"Not meet the minimum for TokenB!");
+
+        // validacion disponibilidad de fondos
+        require(ERC20(tokenA).balanceOf(msg.sender) >= amountA, "Insufficient TokenA funds!");
+        require(ERC20(tokenB).balanceOf(msg.sender) >= amountB, "Insufficient TokenB funds!");
         
-        uint balanceA = IERC20(tokenA).balanceOf(address(this));
-        uint balanceB = IERC20(tokenB).balanceOf(address(this));
-            //calculate the reserves
-        reserveA += amountADesired - amountAMin;
-        reserveB += amountBDesired - amountBMin;
+        reserveA += amountA;
+        reserveB += amountB;
         
-        uint amountAUnits = 0;
+        ERC20(tokenA).transferFrom(msg.sender, address(this), amountA);
+        ERC20(tokenB).transferFrom(msg.sender, address(this), amountB);
+        
+
+       
+    }
+
+    function calculateLiquidityAmounts(uint amountADesired, uint amountBDesired) internal view
+        returns (uint amountA, uint amountB) {
+        if (reserveA == 0 && reserveB == 0) {
+            return (amountADesired, amountBDesired);
+        }
+        uint amountBOptimal = (amountADesired * reserveB) / reserveA;
+        if (amountBOptimal <= amountBDesired) {
+            return (amountADesired, amountBOptimal);
+        } else {
+            uint amountAOptimal = (amountBDesired * reserveA) / reserveB;
+            return (amountAOptimal, amountBDesired);
+        }
+    }
+
+    function calculateLiquidityToken(uint256 amountA, uint256 amountB) internal view returns (uint256){
+        uint proportionA = amountA / reserveA;
+        uint proportionB = amountB / reserveB;
+        return proportionA < proportionB ? proportionA * this.totalSupply() : proportionB * this.totalSupply();
     }
 }
