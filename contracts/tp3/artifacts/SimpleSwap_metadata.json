@@ -420,6 +420,60 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "tokenA",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "tokenB",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "liquidity",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountAMin",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountBMin",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "to",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "deadline",
+						"type": "uint256"
+					}
+				],
+				"name": "removeLiquidity",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "amountA",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amountB",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "renounceOwnership",
 				"outputs": [],
@@ -770,11 +824,11 @@
 			]
 		},
 		"contracts/tp3/SimpleSwap.sol": {
-			"keccak256": "0x5da34d9e749eae67285dda09febc3fea1abe4f061380aa08e8ec1647536b1bc3",
+			"keccak256": "0xe78a9af908fddb22c228cb67794b5c32427c83a9e505e52575e34b2131a6ebd7",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e9da4bcde0a376ca1f4370adb1896d21f44911d357c4c96f4277673f81a30152",
-				"dweb:/ipfs/QmfFL5m9j4wiwh3KDg7C3oj2QS2d5qfEoQBNPDrudNup3J"
+				"bzz-raw://5e743e0f60b01799c7f529ab0a32dd91fb2ebc1b0cd2d88d1bf5243a51fdce7b",
+				"dweb:/ipfs/QmQQhqCLcxpJrezAFurX2SUF2zB5g8hnzEDP61WyvnSsEN"
 			]
 		}
 	},

@@ -45,14 +45,17 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     function addLiquidity(address tokenA, address tokenB, uint amountADesired, uint amountBDesired, 
         uint amountAMin, uint amountBMin, address to, uint deadline) 
         external returns (uint amountA, uint amountB, uint liquidity){
+        
+        uint start = block.timestamp;
         // validacion de parametros
         require(tokenA != address(0) && tokenB != address(0), "Invalid token addresses!");
         require(to != address(0), "Invalid recipient address");
-        require((amountADesired <= 0 || amountBDesired <= 0),"Invalid input parameters!"); 
+        require((amountADesired > 0 && amountBDesired > 0 && deadline > 0 
+            && amountAMin > 0 && amountBMin > 0 ),"Invalid input parameters!"); 
 
         (amountA, amountB) = calculateLiquidityAmounts(amountADesired, amountBDesired);
-        require((amountA > amountAMin),"Not meet the minimum for TokenA!");
-        require((amountB > amountBMin),"Not meet the minimum for TokenB!");
+        require((amountA >= amountAMin),"Not meet the minimum for TokenA!");
+        require((amountB >= amountBMin),"Not meet the minimum for TokenB!");
 
         // validacion disponibilidad de fondos
         require(ERC20(tokenA).balanceOf(msg.sender) >= amountA, "Insufficient TokenA funds!");
@@ -66,7 +69,8 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
 
         liquidity = calculateLiquidityToken(amountA, amountB);
         this.transfer(msg.sender, liquidity);
-       require(deadline > block.timestamp, "Deadline reached!");
+        require(deadline > block.timestamp - start, "Deadline reached!");
+        return (amountA, amountB, liquidity);
     }
 
     function calculateLiquidityAmounts(uint amountADesired, uint amountBDesired) internal view
@@ -83,6 +87,12 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         }
     }
 
+    function calculateTokenAmounts(uint liquidity) internal view returns (uint256, uint256){
+        return (liquidity * reserveA / this.totalSupply(), liquidity * reserveA / this.totalSupply());
+    }
+
+
+
     function calculateLiquidityToken(uint256 amountA, uint256 amountB) internal view returns (uint256){
          if(this.totalSupply() == 0){
              return Math.sqrt(amountA * amountB);
@@ -90,4 +100,33 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
             return (Math.min((amountA / reserveA), (amountB / reserveB)) * this.totalSupply());
         }
     }
+
+    function removeLiquidity(address tokenA, address tokenB, uint liquidity, uint amountAMin, uint amountBMin,
+        address to, uint deadline) external  returns (uint amountA, uint amountB){
+
+        uint start = block.timestamp;
+        require(tokenA != address(0) && tokenB != address(0), "Invalid token addresses!");
+        require(to != address(0), "Invalid recipient address");
+        require((liquidity > 0 && deadline > 0 && amountAMin > 0 && amountBMin > 0),
+        "Invalid input parameters!");
+
+        require(this.balanceOf(msg.sender) >= liquidity, "Insufficient Liquidity Tokens!");
+        (amountA, amountB) = calculateTokenAmounts(liquidity);
+        require((amountA >= amountAMin), "Not meet the minimum for TokenA!");
+        require((amountB >= amountBMin), "Not meet the minimum for TokenB!");
+
+        require((reserveA >= amountA), "Insufficient TokenA!");
+        require((reserveB >= amountB), "Insufficient TokenB!");
+
+        super._burn(msg.sender, liquidity);
+
+        reserveA -= amountA;
+        reserveB -= amountB;
+
+        ERC20(tokenA).transfer(to, amountA);
+        ERC20(tokenB).transfer(to, amountB);
+        require(deadline > block.timestamp - start, "Deadline reached!");
+        return (amountA, amountB);
+    }
 }
+
