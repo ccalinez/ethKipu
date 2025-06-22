@@ -9,6 +9,7 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 
  /**
  * @title SimpleSwap Contract
+ * @author Cristian Alinez
  * @notice A basic automated market maker (AMM) implementing liquidity pool functionality for ERC20 tokens
  * @dev Uses OpenZeppelin libraries for secure token operations, pausing, and ownership management
  */

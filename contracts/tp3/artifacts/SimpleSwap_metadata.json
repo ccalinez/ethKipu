@@ -673,6 +673,7 @@
 			}
 		],
 		"devdoc": {
+			"author": "Cristian Alinez",
 			"details": "Uses OpenZeppelin libraries for secure token operations, pausing, and ownership management",
 			"errors": {
 				"ERC20InsufficientAllowance(address,uint256,uint256)": [
@@ -1024,11 +1025,11 @@
 			]
 		},
 		"contracts/tp3/SimpleSwap.sol": {
-			"keccak256": "0x7664593c78ed21378fcfa32a6e2a4652ec126459a2bd6314bf0d7e61bdb8cb11",
+			"keccak256": "0x0fa79cdd5a18fda3f676bc9b464611f8a9e752371bfc03730010a8674a56ce06",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://36dbb5eb3a064fb3590f26847ae05087f4dbfc0f51b027a47fdbe8132a18508a",
-				"dweb:/ipfs/QmSsGAEvdZBPKXkDXAj4meTU3q2coYa4T3GU2BSgcbCC7b"
+				"bzz-raw://e314da2b5809a3cf9c52b9ee39206d96f8b3d721ab4847fa26f9b720c38c6e35",
+				"dweb:/ipfs/QmNcAGVyV9fECfEHckWayamSYCTbHZJVd4Xg2XEBbFUkFe"
 			]
 		}
 	},
