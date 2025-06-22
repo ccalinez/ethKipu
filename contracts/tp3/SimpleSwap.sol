@@ -14,8 +14,8 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         Ownable(initialOwner)
     {}
 
-    uint256 private reserveA;
-    uint256 private reserveB;
+    uint256  public reserveA;
+    uint256  public reserveB;
 
     function pause() public onlyOwner {
         _pause();
@@ -61,14 +61,15 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         require(ERC20(tokenA).balanceOf(msg.sender) >= amountA, "Insufficient TokenA funds!");
         require(ERC20(tokenB).balanceOf(msg.sender) >= amountB, "Insufficient TokenB funds!");
         
-        reserveA += amountA;
-        reserveB += amountB;
+
 
         ERC20(tokenA).transferFrom(msg.sender, address(this), amountA);
         ERC20(tokenB).transferFrom(msg.sender, address(this), amountB);
 
         liquidity = calculateLiquidityToken(amountA, amountB);
-        this.transfer(msg.sender, liquidity);
+        reserveA += amountA;
+        reserveB += amountB;
+        super._mint(to, liquidity);
         require(deadline > block.timestamp - start, "Deadline reached!");
         return (amountA, amountB, liquidity);
     }
@@ -88,7 +89,7 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     }
 
     function calculateTokenAmounts(uint liquidity) internal view returns (uint256, uint256){
-        return (liquidity * reserveA / this.totalSupply(), liquidity * reserveA / this.totalSupply());
+        return ((liquidity * reserveA / this.totalSupply()), (liquidity * reserveB / this.totalSupply()));
     }
 
 
@@ -97,7 +98,9 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
          if(this.totalSupply() == 0){
              return Math.sqrt(amountA * amountB);
         }else {
-            return (Math.min((amountA / reserveA), (amountB / reserveB)) * this.totalSupply());
+            uint liquidityA = (amountA * totalSupply()) / reserveA;
+            uint liquidityB = (amountB * totalSupply()) / reserveB;
+            return Math.min(liquidityA, liquidityB);
         }
     }
 
@@ -169,6 +172,7 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         ERC20(path[0]).transferFrom(msg.sender, address(this), amountIn);
         ERC20(path[1]).transfer(msg.sender, amountOut);
 
+        amounts = new uint[](2);
         amounts[0] = amountIn;
         amounts[1] = amountOut;
         require(deadline > block.timestamp - start, "Deadline reached!");
