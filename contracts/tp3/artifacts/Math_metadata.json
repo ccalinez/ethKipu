@@ -1,0 +1,45 @@
+{
+	"compiler": {
+		"version": "0.8.27+commit.40a35a09"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [],
+		"devdoc": {
+			"details": "Standard math utilities missing in the Solidity language.",
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/tp3/SimpleSwap_flattened.sol": "Math"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/tp3/SimpleSwap_flattened.sol": {
+			"keccak256": "0xad92824a8919bb64c138ab5b867fb2ee151bbd7435a9b9cd4ca4b21562dc36c0",
+			"urls": [
+				"bzz-raw://c84b1284b296275f074eed70f1faecd3ad8b60730e0bd5afe78cdb104217c8dc",
+				"dweb:/ipfs/QmbNEPEJhEHfZWHLXFCiQKCpJFfjHBqZk5RSAG9tW7rna1"
+			]
+		}
+	},
+	"version": 1
+}

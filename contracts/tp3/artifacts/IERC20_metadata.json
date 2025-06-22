@@ -190,6 +190,7 @@
 			}
 		],
 		"devdoc": {
+			"details": "Interface of the ERC-20 standard as defined in the ERC.",
 			"events": {
 				"Approval(address,address,uint256)": {
 					"details": "Emitted when the allowance of a `spender` for an `owner` is set by a call to {approve}. `value` is the new allowance."
@@ -229,7 +230,7 @@
 	},
 	"settings": {
 		"compilationTarget": {
-			"contracts/tp3/SwapVerifier.sol": "IERC20"
+			"contracts/tp3/MyTokenB_flattened.sol": "IERC20"
 		},
 		"evmVersion": "cancun",
 		"libraries": {},
@@ -243,12 +244,11 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/tp3/SwapVerifier.sol": {
-			"keccak256": "0xf7660855fabca278a4064fe477ab27474083d41cc4bc86958dfb0c502b050549",
-			"license": "MIT",
+		"contracts/tp3/MyTokenB_flattened.sol": {
+			"keccak256": "0xa340aebda8f002fb659e9c5199aa9594d8befe07d34df1d7f5442aa4408db925",
 			"urls": [
-				"bzz-raw://ed77f69b3d264e76acead365e540afda509b2a4d6db09d3f9e62ca68a4d7d66c",
-				"dweb:/ipfs/QmNNRWKmiQyigLApVoJMGqzKhfKVRHg2TCjFf965PmHCxa"
+				"bzz-raw://b9a4809c1d847f0d9210bc16848fce89b04779383bccfc4e89f09235c2269753",
+				"dweb:/ipfs/QmSbTLjv7Sz6v6mXJsvn7szFNgcXjtVMAUqV5sb5DC4q9k"
 			]
 		}
 	},
