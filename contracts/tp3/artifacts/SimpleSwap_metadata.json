@@ -163,31 +163,6 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"indexed": false,
-						"internalType": "string",
-						"name": "token",
-						"type": "string"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "tiene",
-						"type": "uint256"
-					},
-					{
-						"indexed": false,
-						"internalType": "uint256",
-						"name": "necesita",
-						"type": "uint256"
-					}
-				],
-				"name": "FondosInsuficientes",
-				"type": "event"
-			},
-			{
-				"anonymous": false,
-				"inputs": [
-					{
 						"indexed": true,
 						"internalType": "address",
 						"name": "previousOwner",
@@ -698,6 +673,7 @@
 			}
 		],
 		"devdoc": {
+			"details": "Uses OpenZeppelin libraries for secure token operations, pausing, and ownership management",
 			"errors": {
 				"ERC20InsufficientAllowance(address,uint256,uint256)": [
 					{
@@ -788,6 +764,24 @@
 			},
 			"kind": "dev",
 			"methods": {
+				"addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)": {
+					"details": "Transfers tokenA and tokenB from sender and mints liquidity tokens based on the input and reserves",
+					"params": {
+						"amountADesired": "Desired amount of tokenA to add",
+						"amountAMin": "Minimum amount of tokenA to add",
+						"amountBDesired": "Desired amount of tokenB to add",
+						"amountBMin": "Minimum amount of tokenB to add",
+						"deadline": "Deadline timestamp by which transaction must be completed",
+						"to": "Recipient address of the liquidity tokens",
+						"tokenA": "Address of the tokenA",
+						"tokenB": "Address of the tokenB"
+					},
+					"returns": {
+						"amountA": "Amount of tokenA actually added",
+						"amountB": "Amount of tokenB actually added",
+						"liquidity": "Amount of liquidity tokens minted"
+					}
+				},
 				"allowance(address,address)": {
 					"details": "See {IERC20-allowance}."
 				},
@@ -797,8 +791,35 @@
 				"balanceOf(address)": {
 					"details": "See {IERC20-balanceOf}."
 				},
+				"constructor": {
+					"details": "Initializes ERC20 token with name \"LiquidityToken\" and symbol \"LTK\"",
+					"params": {
+						"initialOwner": "The address of the initial owner of the contract"
+					}
+				},
 				"decimals()": {
 					"details": "Returns the number of decimals used to get its user representation. For example, if `decimals` equals `2`, a balance of `505` tokens should be displayed to a user as `5.05` (`505 / 10 ** 2`). Tokens usually opt for a value of 18, imitating the relationship between Ether and Wei. This is the default value returned by this function, unless it's overridden. NOTE: This information is only used for _display_ purposes: it in no way affects any of the arithmetic of the contract, including {IERC20-balanceOf} and {IERC20-transfer}."
+				},
+				"getAmountOut(uint256,uint256,uint256)": {
+					"details": "Uses a constant product formula without fees",
+					"params": {
+						"amountIn": "Amount of input tokens",
+						"reserveIn": "Current reserve of the input token",
+						"reserveOut": "Current reserve of the output token"
+					},
+					"returns": {
+						"amountOut": "The amount of output tokens the user would receive"
+					}
+				},
+				"getPrice(address,address)": {
+					"details": "The price is scaled by 1e18 for precision",
+					"params": {
+						"tokenA": "The address of tokenA",
+						"tokenB": "The address of tokenB"
+					},
+					"returns": {
+						"price": "The calculated price (tokenB/tokenA * 1e18)"
+					}
 				},
 				"name()": {
 					"details": "Returns the name of the token."
@@ -806,11 +827,43 @@
 				"owner()": {
 					"details": "Returns the address of the current owner."
 				},
+				"pause()": {
+					"details": "Only callable by the owner"
+				},
 				"paused()": {
 					"details": "Returns true if the contract is paused, and false otherwise."
 				},
+				"removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)": {
+					"details": "Burns liquidity tokens and transfers tokenA and tokenB to user",
+					"params": {
+						"amountAMin": "Minimum amount of tokenA to withdraw",
+						"amountBMin": "Minimum amount of tokenB to withdraw",
+						"deadline": "Deadline timestamp by which the transaction must be completed",
+						"liquidity": "Amount of liquidity tokens to burn",
+						"to": "Address to send the withdrawn tokens",
+						"tokenA": "Address of tokenA",
+						"tokenB": "Address of tokenB"
+					},
+					"returns": {
+						"amountA": "The amount of tokenA withdrawn",
+						"amountB": "The amount of tokenB withdrawn"
+					}
+				},
 				"renounceOwnership()": {
 					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+				},
+				"swapExactTokensForTokens(uint256,uint256,address[],address,uint256)": {
+					"details": "Currently only supports swaps between two tokens using predefined reserves. No slippage protection other than `amountOutMin`.",
+					"params": {
+						"amountIn": "Exact amount of input tokens to swap",
+						"amountOutMin": "Minimum amount of output tokens to receive (slippage protection)",
+						"deadline": "Timestamp by which the transaction must be mined",
+						"path": "Array of two token addresses [tokenIn, tokenOut]",
+						"to": "Address to receive the output tokens"
+					},
+					"returns": {
+						"amounts": "Array containing [amountIn, amountOut]"
+					}
 				},
 				"symbol()": {
 					"details": "Returns the symbol of the token, usually a shorter version of the name."
@@ -826,13 +879,43 @@
 				},
 				"transferOwnership(address)": {
 					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				},
+				"unpause()": {
+					"details": "Only callable by the owner"
 				}
 			},
+			"title": "SimpleSwap Contract",
 			"version": 1
 		},
 		"userdoc": {
 			"kind": "user",
-			"methods": {},
+			"methods": {
+				"addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)": {
+					"notice": "Adds liquidity to the pool"
+				},
+				"constructor": {
+					"notice": "Constructor to initialize the contract with an owner"
+				},
+				"getAmountOut(uint256,uint256,uint256)": {
+					"notice": "Calculates the amount of output tokens that will be received given an input amount and reserves"
+				},
+				"getPrice(address,address)": {
+					"notice": "Returns the price of tokenA in terms of tokenB based on current reserves"
+				},
+				"pause()": {
+					"notice": "Pauses the contract, restricting certain functions"
+				},
+				"removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)": {
+					"notice": "Removes liquidity from the pool, returning tokens to the user"
+				},
+				"swapExactTokensForTokens(uint256,uint256,address[],address,uint256)": {
+					"notice": "Swaps an exact amount of one token for another"
+				},
+				"unpause()": {
+					"notice": "Unpauses the contract"
+				}
+			},
+			"notice": "A basic automated market maker (AMM) implementing liquidity pool functionality for ERC20 tokens",
 			"version": 1
 		}
 	},
@@ -941,11 +1024,11 @@
 			]
 		},
 		"contracts/tp3/SimpleSwap.sol": {
-			"keccak256": "0x10541b39584ea0e02e84e34e5b43cd606c6a3bbce44ffa562888bfb4fd615ba5",
+			"keccak256": "0x7664593c78ed21378fcfa32a6e2a4652ec126459a2bd6314bf0d7e61bdb8cb11",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://176336fb693aa7264f983eb4533bc319b8d373cba7053c55f462125f0d1e7795",
-				"dweb:/ipfs/QmfCTgAmSTBTzvo2CTFMxKY39ouicZHH4N6KD8FUD5c49s"
+				"bzz-raw://36dbb5eb3a064fb3590f26847ae05087f4dbfc0f51b027a47fdbe8132a18508a",
+				"dweb:/ipfs/QmSsGAEvdZBPKXkDXAj4meTU3q2coYa4T3GU2BSgcbCC7b"
 			]
 		}
 	},
