@@ -11,11 +11,10 @@ import "@openzeppelin/contracts/utils/math/Math.sol";
 contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     constructor(address initialOwner)
         ERC20("LiquidityToken", "LTK")
-        Ownable(initialOwner)
-    {}
+        Ownable(initialOwner){}
 
-    uint256  public reserveA;
-    uint256  public reserveB;
+    uint256  private reserveA;
+    uint256  private reserveB;
 
     function pause() public onlyOwner {
         _pause();
@@ -103,7 +102,7 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         uint start = block.timestamp;
         require(tokenA != address(0) && tokenB != address(0), "Invalid token addresses!");
         require(to != address(0), "Invalid recipient address");
-        require((liquidity > 0 && deadline > 0 && amountAMin > 0 && amountBMin > 0),
+        require((liquidity > 0 && deadline > 0 && amountAMin >= 0 && amountBMin >= 0),
         "Invalid input parameters!");
 
         require(this.balanceOf(msg.sender) >= liquidity, "Insufficient Liquidity Tokens!");
@@ -138,6 +137,8 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         return amountOut;
      }
 
+     event FondosInsuficientes(string token, uint tiene, uint necesita);
+
      function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path,
          address to, uint deadline) external returns (uint[] memory amounts){
         
@@ -151,8 +152,9 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
 
         uint amountOut = this.getAmountOut(amountIn, (isTokenA ? reserveA : reserveB), (isTokenA ? reserveB : reserveA));
         require((amountOut >= amountOutMin),"Not meet the minimum!");
-        require(ERC20(path[0]).balanceOf(msg.sender) >= amountIn, "Insufficient Token funds!");
-        require(ERC20(path[1]).balanceOf(address(this)) >= amountOut, "Insufficient Token funds!");
+
+        require(ERC20(path[0]).balanceOf(msg.sender) >= amountIn, "Insufficient Token IN funds!");
+        require(ERC20(path[1]).balanceOf(address(this)) >= amountOut, "Insufficient Token OUT funds!");
         
         if(isTokenA){
             reserveA += amountIn;
