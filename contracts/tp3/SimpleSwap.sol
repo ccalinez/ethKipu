@@ -34,13 +34,6 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         super._update(from, to, value);
     }
 
-    /**
-    *  Given some asset amount and reserves, returns an amount of the other asset representing equivalent value.
-    */
-    function quote(uint amountA, uint reserveA, uint reserveB) internal pure returns (uint amountB){
-        return ((amountA * reserveB) / (reserveA + amountA));
-    }
-
 
     function addLiquidity(address tokenA, address tokenB, uint amountADesired, uint amountBDesired, 
         uint amountAMin, uint amountBMin, address to, uint deadline) 
@@ -156,7 +149,7 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
 
         bool isTokenA = keccak256(abi.encodePacked(ERC20(path[0]).symbol())) == keccak256(abi.encodePacked("MTKA"));
 
-        uint amountOut = this.getAmountOut(amountIn, (isTokenA ? reserveA : reserveB), isTokenA ? reserveB : reserveA);
+        uint amountOut = this.getAmountOut(amountIn, (isTokenA ? reserveA : reserveB), (isTokenA ? reserveB : reserveA));
         require((amountOut >= amountOutMin),"Not meet the minimum!");
         require(ERC20(path[0]).balanceOf(msg.sender) >= amountIn, "Insufficient Token funds!");
         require(ERC20(path[1]).balanceOf(address(this)) >= amountOut, "Insufficient Token funds!");
