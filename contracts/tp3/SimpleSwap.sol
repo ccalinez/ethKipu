@@ -20,6 +20,25 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     // @notice Reserve of TokenB in the pool
     uint256  private reserveB;
 
+    /// @notice Emitted when liquidity tokens are minted after adding liquidity
+    /// @param tokenAIn Amount of tokenA deposited
+    /// @param tokenBIn Amount of tokenB deposited
+    /// @param liquidityOut Amount of liquidity tokens minted
+    event LiquidityAdded(uint tokenAIn, uint tokenBIn, uint liquidityOut);
+
+    /// @notice Emitted when liquidity tokens are burned after removing liquidity
+    /// @param tokenAOut Amount of tokenA withdrawn
+    /// @param tokenBOut Amount of tokenB withdrawn
+    /// @param liquidityIn Amount of liquidity tokens burned
+    event LiquidityRemoved(uint tokenAOut, uint tokenBOut, uint liquidityIn);
+
+    /// @notice Emitted when a token swap occurs in the pool
+    /// @param tokenIn Symbol of input token swapped in
+    /// @param amountIn Amount of input tokens swapped
+    /// @param tokenOut Symbol of output token swapped out
+    /// @param amountOut Amount of output tokens received
+    event TokenSwapped(string tokenIn, uint amountIn, string tokenOut, uint amountOut);
+
     /**
      * @notice Constructor to initialize the contract with an owner
      * @param initialOwner The address of the initial owner of the contract
@@ -89,6 +108,7 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         reserveB += amountB;
         super._mint(to, liquidity);
         require(deadline > block.timestamp - start, "Deadline reached!");
+        emit LiquidityAdded(amountA, amountB, liquidity);
         return (amountA, amountB, liquidity);
     }
 
@@ -135,6 +155,7 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         ERC20(tokenA).transfer(to, amountA);
         ERC20(tokenB).transfer(to, amountB);
         require(deadline > block.timestamp - start, "Deadline reached!");
+        emit LiquidityAdded(amountA, amountB, liquidity);
         return (amountA, amountB);
     }
 
@@ -148,9 +169,11 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
      function getPrice(address tokenA, address tokenB) 
         external view 
         returns (uint price){
+        uint _reserveA = reserveA;
+        uint _reserveB = reserveB;
         require(tokenA != address(0) && tokenB != address(0), "Invalid token addresses!");
-        require(reserveA > 0 && reserveB > 0, "No available liquidity tokens!");
-        price = (reserveB * 1e18) / reserveA;
+        require(_reserveA > 0 && _reserveB > 0, "No available liquidity tokens!");
+        price = (_reserveB * 1e18) / _reserveA;
         return price;
      }
 
@@ -193,7 +216,9 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         // Determine the type of token you want to exchange A or B
         bool isTokenA = keccak256(abi.encodePacked(ERC20(path[0]).symbol())) == keccak256(abi.encodePacked("MTKA"));
         // Calculate the amount of tokens that will be delivered
-        uint amountOut = this.getAmountOut(amountIn, (isTokenA ? reserveA : reserveB), (isTokenA ? reserveB : reserveA));
+        uint _reserveA = reserveA;
+        uint _reserveB = reserveB;
+        uint amountOut = this.getAmountOut(amountIn, (isTokenA ? _reserveA : _reserveB), (isTokenA ? _reserveB : _reserveA));
         require((amountOut >= amountOutMin),"Not meet the minimum!");
         // Check for sufficient balances
         require(ERC20(path[0]).balanceOf(msg.sender) >= amountIn, "Insufficient Token IN funds!");
@@ -214,6 +239,7 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         amounts[0] = amountIn;
         amounts[1] = amountOut;
         require(deadline > block.timestamp - start, "Deadline reached!");
+        emit TokenSwapped(ERC20(path[0]).symbol(), amountIn, ERC20(path[1]).symbol(), amountOut);
         return amounts;
      }
 
@@ -241,14 +267,16 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     function calculateLiquidityAmounts(uint amountADesired, uint amountBDesired) 
         internal view
         returns (uint amountA, uint amountB) {
-        if (reserveA == 0 && reserveB == 0) {
+        uint _reserveA = reserveA;
+        uint _reserveB = reserveB;
+        if (_reserveA == 0 && _reserveB == 0) {
             return (amountADesired, amountBDesired);
         }
-        uint amountBOptimal = (amountADesired * reserveB) / reserveA;
+        uint amountBOptimal = (amountADesired * _reserveB) / _reserveA;
         if (amountBOptimal <= amountBDesired) {
             return (amountADesired, amountBOptimal);
         } else {
-            uint amountAOptimal = (amountBDesired * reserveA) / reserveB;
+            uint amountAOptimal = (amountBDesired * _reserveA) / _reserveB;
             return (amountAOptimal, amountBDesired);
         }
     }
@@ -263,7 +291,8 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     function calculateTokenAmounts(uint liquidity) 
         internal view 
         returns (uint256, uint256){
-        return ((liquidity * reserveA / this.totalSupply()), (liquidity * reserveB / this.totalSupply()));
+        uint _totalSuply = totalSupply();
+        return ((liquidity * reserveA / _totalSuply), (liquidity * reserveB / _totalSuply));
     }
 
     /**
@@ -276,12 +305,12 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
     function calculateLiquidityToken(uint256 amountA, uint256 amountB) 
         internal view 
         returns (uint256){
-
-         if(this.totalSupply() == 0){
+        uint _totalSuply = totalSupply();
+        if(_totalSuply == 0){
              return Math.sqrt(amountA * amountB);
         }else {
-            uint liquidityA = (amountA * totalSupply()) / reserveA;
-            uint liquidityB = (amountB * totalSupply()) / reserveB;
+            uint liquidityA = (amountA * _totalSuply) / reserveA;
+            uint liquidityB = (amountB * _totalSuply) / reserveB;
             return Math.min(liquidityA, liquidityB);
         }
     }

@@ -1,60 +1,145 @@
-# SimpleSwap Smart Contract
+````markdown
+# SimpleSwap
+
+**Author:** Cristian Alinez  
+**Solidity Version:** ^0.8.27  
+**License:** MIT
+
+---
 
 ## Overview
 
-**SimpleSwap** is a basic Automated Market Maker (AMM) implemented in Solidity for handling ERC20 token swaps and liquidity provisioning. It supports operations like adding/removing liquidity, token swaps, and price retrievals, while leveraging OpenZeppelin's secure contract libraries.
+SimpleSwap is a basic Automated Market Maker (AMM) smart contract implementing liquidity pool functionality for ERC20 tokens. It allows users to add/remove liquidity and swap tokens securely using OpenZeppelin libraries for token operations, ownership, and pausability.
+
+---
 
 ## Features
 
-- ERC20-based Liquidity Token (`LTK`)
-- Liquidity pool management for two ERC20 tokens
-- Token swap using constant product formula
-- Pausable contract functionality for emergency control
-- Ownership control using OpenZeppelin's `Ownable`
+- Add liquidity by depositing TokenA and TokenB and mint liquidity tokens.
+- Remove liquidity by burning liquidity tokens and withdrawing TokenA and TokenB.
+- Swap exact amounts of one token for another.
+- Pausable contract controlled by the owner.
+- Price calculation based on current reserves.
+- Safe token transfers using OpenZeppelin standards.
 
-## Contract Details
+---
 
-- Token Name: `LiquidityToken`
-- Token Symbol: `LTK`
-- Author: Cristian Alinez
-- Solidity Version: ^0.8.27
-- License: MIT
+## Contract Addresses
 
-## Functions
+| Contract       | Address                                     |
+| -------------- | ------------------------------------------- |
+| TokenA (MTKA)  | `0x1234567890abcdef1234567890abcdef12345678` |
+| TokenB (MTKB)  | `0xabcdef1234567890abcdef1234567890abcdef12` |
+| SimpleSwap     | `0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef` |
 
-### Owner-Only
+> **Note:** Replace the above addresses with your actual deployed contract addresses.
 
-- `pause()` – Pauses the contract.
-- `unpause()` – Unpauses the contract.
+---
 
-### Liquidity Management
+## Deployment
 
-- `addLiquidity(...)` – Adds liquidity to the pool and mints LTK.
-- `removeLiquidity(...)` – Removes liquidity and returns underlying tokens.
+The contract is deployed with an initial owner address that can pause/unpause the contract and manage ownership.
 
-### Swapping
+```solidity
+constructor(address initialOwner) 
+````
 
-- `swapExactTokensForTokens(...)` – Swaps a specified amount of one token for another.
+---
 
-### Utility
+## Usage
 
-- `getPrice(...)` – Returns tokenA/tokenB price based on reserves.
-- `getAmountOut(...)` – Calculates output token amount for a given input using reserves.
+### Adding Liquidity
 
-## Internal Calculations
+```solidity
+addLiquidity(
+    address tokenA, 
+    address tokenB, 
+    uint amountADesired, 
+    uint amountBDesired, 
+    uint amountAMin, 
+    uint amountBMin, 
+    address to, 
+    uint deadline
+) external returns (uint amountA, uint amountB, uint liquidity);
+```
 
-- `calculateLiquidityAmounts(...)` – Optimal deposit amounts based on reserve ratios.
-- `calculateTokenAmounts(...)` – Converts LTK to tokenA/tokenB amounts.
-- `calculateLiquidityToken(...)` – Mints appropriate amount of LTK based on deposits.
+* Adds liquidity to the pool by depositing TokenA and TokenB.
+* Mints liquidity tokens to the specified address `to`.
+* Requires approval of token transfers beforehand.
 
-## Dependencies
+---
 
-- OpenZeppelin Contracts v5+:
-  - ERC20
-  - ERC20Pausable
-  - Ownable
-  - Math
+### Removing Liquidity
+
+```solidity
+removeLiquidity(
+    address tokenA, 
+    address tokenB, 
+    uint liquidity, 
+    uint amountAMin, 
+    uint amountBMin, 
+    address to, 
+    uint deadline
+) external returns (uint amountA, uint amountB);
+```
+
+* Burns liquidity tokens and withdraws underlying TokenA and TokenB.
+* Tokens are sent to the address `to`.
+
+---
+
+### Swapping Tokens
+
+```solidity
+swapExactTokensForTokens(
+    uint amountIn, 
+    uint amountOutMin, 
+    address[] calldata path, 
+    address to, 
+    uint deadline
+) external returns (uint[] memory amounts);
+```
+
+* Swaps `amountIn` of one token for another, enforcing a minimum output amount (`amountOutMin`) to protect against slippage.
+* `path` must be an array of length 2 with `[tokenIn, tokenOut]`.
+* The swapped tokens are sent to the address `to`.
+
+---
+
+### Pausing / Unpausing
+
+Only the contract owner can pause/unpause the contract.
+
+```solidity
+pause() external onlyOwner;
+unpause() external onlyOwner;
+```
+
+---
+
+## Events
+
+* `LiquidityAdded(uint tokenAIn, uint tokenBIn, uint liquidityOut)`
+* `LiquidityRemoved(uint tokenAOut, uint tokenBOut, uint liquidityIn)`
+* `TokenSwapped(string tokenIn, uint amountIn, string tokenOut, uint amountOut)`
+
+---
+
+## Notes
+
+* Ensure token approvals are granted to the SimpleSwap contract before calling `addLiquidity` or `swapExactTokensForTokens`.
+* Deadlines are enforced to protect users from front-running and stale transactions.
+* This contract currently supports only two tokens in the pool and swaps between them.
+
+---
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+This project is licensed under the MIT License.
+
+---
+
+If you have any questions or want to contribute, please reach out to Cristian Alinez.
+
+```
+
