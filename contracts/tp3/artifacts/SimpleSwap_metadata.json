@@ -834,8 +834,30 @@
 				"Approval(address,address,uint256)": {
 					"details": "Emitted when the allowance of a `spender` for an `owner` is set by a call to {approve}. `value` is the new allowance."
 				},
+				"LiquidityAdded(uint256,uint256,uint256)": {
+					"params": {
+						"liquidityOut": "Amount of liquidity tokens minted",
+						"tokenAIn": "Amount of tokenA deposited",
+						"tokenBIn": "Amount of tokenB deposited"
+					}
+				},
+				"LiquidityRemoved(uint256,uint256,uint256)": {
+					"params": {
+						"liquidityIn": "Amount of liquidity tokens burned",
+						"tokenAOut": "Amount of tokenA withdrawn",
+						"tokenBOut": "Amount of tokenB withdrawn"
+					}
+				},
 				"Paused(address)": {
 					"details": "Emitted when the pause is triggered by `account`."
+				},
+				"TokenSwapped(string,uint256,string,uint256)": {
+					"params": {
+						"amountIn": "Amount of input tokens swapped",
+						"amountOut": "Amount of output tokens received",
+						"tokenIn": "Symbol of input token swapped in",
+						"tokenOut": "Symbol of output token swapped out"
+					}
 				},
 				"Transfer(address,address,uint256)": {
 					"details": "Emitted when `value` tokens are moved from one account (`from`) to another (`to`). Note that `value` may be zero."
@@ -970,6 +992,17 @@
 			"version": 1
 		},
 		"userdoc": {
+			"events": {
+				"LiquidityAdded(uint256,uint256,uint256)": {
+					"notice": "Emitted when liquidity tokens are minted after adding liquidity"
+				},
+				"LiquidityRemoved(uint256,uint256,uint256)": {
+					"notice": "Emitted when liquidity tokens are burned after removing liquidity"
+				},
+				"TokenSwapped(string,uint256,string,uint256)": {
+					"notice": "Emitted when a token swap occurs in the pool"
+				}
+			},
 			"kind": "user",
 			"methods": {
 				"addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)": {
@@ -1106,11 +1139,11 @@
 			]
 		},
 		"contracts/tp3/SimpleSwap.sol": {
-			"keccak256": "0x77b6ced5db1f0bd44ce3f5249f2b83411630117a9c2ebbcc608d3688df074b46",
+			"keccak256": "0xc06c92b4e75703b5a4d4c669f1b7818365391c45f30bf81c80c5fd9cbe0f4145",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://cf0b588dbba026d687de919e2bea67f187cd35bbf17883f4a290b452451cbb68",
-				"dweb:/ipfs/QmPXkH4SMzaxBDpj92Q3yaf4W9W8pDvvVnmgAA3CLNV1ux"
+				"bzz-raw://04cef61421329180615ecc89465abe40ac1be322ba25cbcbe3f91d95ba8b2ad0",
+				"dweb:/ipfs/QmSQeThbWR7stG3TaFspWvz4PhdhyKRxhvuWfuR6TXzx7c"
 			]
 		}
 	},

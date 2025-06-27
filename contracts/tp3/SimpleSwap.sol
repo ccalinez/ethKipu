@@ -130,6 +130,8 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         external whenNotPaused 
         returns (uint amountA, uint amountB){
 
+        uint _reserveA = reserveA;
+        uint _reserveB = reserveB;
         uint start = block.timestamp;
         // Check inputs
         require(tokenA != address(0) && tokenB != address(0), "Invalid token addresses!");
@@ -144,13 +146,13 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         require((amountA >= amountAMin), "Not meet the minimum for TokenA!");
         require((amountB >= amountBMin), "Not meet the minimum for TokenB!");
         // Check that there are reserves to cover transfers 
-        require((reserveA >= amountA), "Insufficient TokenA!");
-        require((reserveB >= amountB), "Insufficient TokenB!");
+        require((_reserveA >= amountA), "Insufficient TokenA!");
+        require((_reserveB >= amountB), "Insufficient TokenB!");
         // Burn liquidity tokens
         super._burn(msg.sender, liquidity);
         // Update reserves
-        reserveA -= amountA;
-        reserveB -= amountB;
+        reserveA = _reserveA - amountA;
+        reserveB = _reserveB - amountB;
         // Transfer tokens to user
         ERC20(tokenA).transfer(to, amountA);
         ERC20(tokenB).transfer(to, amountB);
@@ -225,11 +227,11 @@ contract SimpleSwap is ERC20, ERC20Pausable, Ownable {
         require(ERC20(path[1]).balanceOf(address(this)) >= amountOut, "Insufficient Token OUT funds!");
         // Update reserves
         if(isTokenA){
-            reserveA += amountIn;
-            reserveB -= amountOut;
+            reserveA = _reserveA + amountIn;
+            reserveB = _reserveB - amountOut;
         }else{
-            reserveA -= amountIn;
-            reserveB += amountOut; 
+            reserveA =  _reserveA - amountIn;
+            reserveB =  _reserveB + amountOut; 
         }
         // Transter tokens
         ERC20(path[0]).transferFrom(msg.sender, address(this), amountIn);
